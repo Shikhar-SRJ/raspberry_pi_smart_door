@@ -53,7 +53,7 @@ try:
         ret, frame = source.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        face_cls = cv2.CascadeClassifier('../facial_recognition_model.xml')
+        face_cls = cv2.CascadeClassifier('facial_recognition_model.xml')
         faces = face_cls.detectMultiScale(gray, 1.3, 5)
 
         input_shape = input_details[0]['shape']
