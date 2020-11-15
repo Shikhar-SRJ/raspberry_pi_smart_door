@@ -15,7 +15,7 @@
 #import sys
 #sys.path.append("/home/pi/lcd") # example, path to lcddriver.py
 
-import i2c_lib
+from test_lcd import i2c_lib
 from time import *
 
 # LCD Address
