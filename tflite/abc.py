@@ -4,8 +4,8 @@ import numpy as np
 import os
 from time import sleep
 
-label = ""
 global label
+label = ""
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 model_path = os.path.join(base_dir, 'mask_detection.tflite')
