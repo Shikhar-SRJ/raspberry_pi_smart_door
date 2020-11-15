@@ -34,8 +34,6 @@ def end_read(signal, frame):
 signal.signal(signal.SIGINT, end_read)
 MIFAREReader = MFRC522.MFRC522()
 
-cam = VideoCamera()
-
 try:
     while True:
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
