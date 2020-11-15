@@ -42,7 +42,7 @@ try:
         if status == MIFAREReader.MI_OK:
             print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
             display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
-        sleep(4)
+            sleep(4)
         display.lcd_clear()
         amb_temp = f"Amb Temp: {to_fahrenheit(mlx.ambient_temperature)}"
         obj_temp = f"Obj Temp: {to_fahrenheit(mlx.object_temperature)}"
