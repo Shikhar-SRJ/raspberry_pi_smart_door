@@ -60,7 +60,7 @@ try:
         img_size = 100
 
         label_dict = {0: 'MASK', 1: "NO MASK"}
-
+        stat = None
         for x, y, w, h in faces:
             face_img = gray[y:y + h, x:x + w]
             resized = cv2.resize(face_img, (img_size, img_size))
@@ -71,6 +71,7 @@ try:
             interpreter.invoke()
             result = interpreter.get_tensor(output_details[0]['index'])
             label = np.argmax(result, axis=1)[0]
+            stat = label_dict[label]
 
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
         if status == MIFAREReader.MI_OK:
@@ -89,10 +90,14 @@ try:
             sleep(2)
             display.lcd_clear()
             display.lcd_display_string('MASK STATUS', 1)
-            display.lcd_display_string(str(label_dict[label]), 2)
+            if stat is not None:
+                display.lcd_display_string(str(stat), 2)
+            else:
+                display.lcd_display_string("No one is here", 2)
             sleep(2)
             display.lcd_clear()
         sleep(1)
 except KeyboardInterrupt:
     display.lcd_clear()
     GPIO.cleanup()
+    source.release()
