@@ -27,7 +27,6 @@ class VideoCamera(object):
         img_size = 100
 
         label_dict = {0: 'MASK', 1: "NO MASK"}
-        color_dict = {0: (0, 255, 0), 1: (0, 0, 255)}
 
         for x, y, w, h in faces:
             face_img = gray[y:y + h, x:x + w]
