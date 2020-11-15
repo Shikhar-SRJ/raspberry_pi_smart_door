@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-import mfrc522 as  MFRC522
+from test_rfid import mfrc522 as MFRC522
 import signal
 
 continue_reading = True
