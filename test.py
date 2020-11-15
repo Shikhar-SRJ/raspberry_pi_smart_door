@@ -13,7 +13,7 @@ from test_rfid import mfrc522 as MFRC522
 import signal
 
 # for camera
-from camera import VideoCamera
+from tflite import abc
 
 display = lcddriver.lcd()
 
@@ -55,8 +55,8 @@ try:
             sleep(2)
             display.lcd_clear()
             display.lcd_display_string('MASK STATUS', 1)
-            if cam.get_mask:
-                display.lcd_display_string(str(cam.get_mask(), 2))
+            if not abc.get_label() == "":
+                display.lcd_display_string(str(abc.get_label()), 2)
             else:
                 display.lcd_display_string('No one here')
             sleep(2)
