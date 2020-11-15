@@ -13,7 +13,11 @@ from test_rfid import mfrc522 as MFRC522
 import signal
 
 # for camera
-from tflite import abc
+import tflite_runtime.interpreter as tflite
+import cv2
+import numpy as np
+import os
+
 
 display = lcddriver.lcd()
 
@@ -34,8 +38,40 @@ def end_read(signal, frame):
 signal.signal(signal.SIGINT, end_read)
 MIFAREReader = MFRC522.MFRC522()
 
+model_path = '/home/pi/pro/tflite/mask_detection.tflite'
+interpreter = tflite.Interpreter(model_path=model_path)
+interpreter.allocate_tensors()
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+label_dict = {0:'MASK', 1:"NO MASK"}
+
+source = cv2.VideoCapture(0)
+sleep(1)
+
 try:
     while True:
+        ret, frame = source.read()
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        face_cls = cv2.CascadeClassifier('../facial_recognition_model.xml')
+        faces = face_cls.detectMultiScale(gray, 1.3, 5)
+
+        input_shape = input_details[0]['shape']
+        img_size = 100
+
+        label_dict = {0: 'MASK', 1: "NO MASK"}
+
+        for x, y, w, h in faces:
+            face_img = gray[y:y + h, x:x + w]
+            resized = cv2.resize(face_img, (img_size, img_size))
+            normalized = resized / 255.0
+            reshaped = np.reshape(normalized, input_shape)
+            reshaped = np.float32(reshaped)
+            interpreter.set_tensor(input_details[0]['index'], reshaped)
+            interpreter.invoke()
+            result = interpreter.get_tensor(output_details[0]['index'])
+            label = np.argmax(result, axis=1)[0]
+
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
         if status == MIFAREReader.MI_OK:
             print("card detected")
@@ -53,11 +89,7 @@ try:
             sleep(2)
             display.lcd_clear()
             display.lcd_display_string('MASK STATUS', 1)
-            print(abc.get_label())
-            if not abc.get_label() == "":
-                display.lcd_display_string(str(abc.get_label()), 2)
-            else:
-                display.lcd_display_string('No one here')
+            display.lcd_display_string(str(label_dict[label]), 2)
             sleep(2)
             display.lcd_clear()
         sleep(1)
