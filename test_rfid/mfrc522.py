@@ -4,7 +4,7 @@ import signal
 import time
 
 class MFRC522:
-  NRSTPD = 11
+  NRSTPD = 17
 
   MAX_LEN = 16
 
@@ -107,7 +107,7 @@ class MFRC522:
   def __init__(self, dev='/dev/spidev0.0', spd=1000000):
     global spidev
     spidev = spi.openSPI(device=dev,speed=spd)
-    GPIO.setmode(GPIO.BOARD) #BOARD
+    GPIO.setmode(GPIO.BCM) #BOARD
     GPIO.setup(self.NRSTPD, GPIO.OUT)
     GPIO.output(self.NRSTPD, 1)
     self.MFRC522_Init()
