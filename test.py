@@ -55,6 +55,7 @@ try:
             sleep(2)
             display.lcd_clear()
             display.lcd_display_string('MASK STATUS', 1)
+            print(abc.get_label())
             if not abc.get_label() == "":
                 display.lcd_display_string(str(abc.get_label()), 2)
             else:
