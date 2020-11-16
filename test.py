@@ -105,10 +105,10 @@ try:
             print(tag)
             display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
             sleep(2)
+            display.lcd_clear()
             display.lcd_display_string(auth, 1)
             display.lcd_display_string(auth_name, 2)
             sleep(2)
-            display.lcd_clear()
             amb_temp = f"Env Temp: {to_fahrenheit(mlx.ambient_temperature)}"
             obj_temp = f"Body Temp: {to_fahrenheit(mlx.object_temperature)}"
             display.lcd_clear()
