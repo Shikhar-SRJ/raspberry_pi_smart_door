@@ -107,7 +107,7 @@ try:
             sleep(2)
             display.lcd_clear()
             display.lcd_display_string(auth, 1)
-            display.lcd_display_string(auth_name, 2)
+            display.lcd_display_string("Welcome "+auth_name, 2)
             sleep(2)
             amb_temp = f"Env Temp: {to_fahrenheit(mlx.ambient_temperature)}"
             obj_temp = f"Body Temp: {to_fahrenheit(mlx.object_temperature)}"
