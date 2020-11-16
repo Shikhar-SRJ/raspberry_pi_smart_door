@@ -127,7 +127,7 @@ try:
                 display.lcd_display_string("No face visible", 2)
             sleep(2)
             display.lcd_clear()
-            if auth=='Auth Success' and str(stat)=='MASK' and to_fahrenheit(mlx.object_temperature) < 100:
+            if auth=='Auth Success' and to_fahrenheit(mlx.object_temperature) < 100:
                 print(auth)
                 print(stat)
                 print(to_fahrenheit(mlx.object_temperature))
