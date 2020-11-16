@@ -92,15 +92,23 @@ try:
             print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
             tag = (uid[0], uid[1], uid[2], uid[3])
             if tag not in tags:
-                print('Unauthorized card')
+                auth = 'Unauthorized card'
+                auth_name = ''
+                print(auth)
             for i in database:
                 if i['tag']==tag:
-                    print('Authentication Successful')
-                    print(f"Welcome {i['name']}")
+                    auth = 'Authentication Successful'
+                    print(auth)
+                    auth_name = i['name']
+                    print(f"Welcome {auth_name}")
                     continue
             print(tag)
             display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
             sleep(2)
+            display.lcd_display_string(auth, 1)
+            display.lcd_display_string(auth_name, 2)
+            sleep(2)
+            display.lcd_clear()
             amb_temp = f"Env Temp: {to_fahrenheit(mlx.ambient_temperature)}"
             obj_temp = f"Body Temp: {to_fahrenheit(mlx.object_temperature)}"
             display.lcd_clear()
