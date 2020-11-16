@@ -21,9 +21,11 @@ import os
 database = [
     {'name': 'Ali', 'tag': (136, 4, 55, 30)},
     {'name': 'Saif', 'tag': (231, 176, 71, 98)},
-    {'name': 'Marwan', 'tag': (136, 4, 198, 81)},
+    {'name': 'Marwan', 'tag': (136, 4, 198, 181)},
 ]
-
+tags = []
+for i in database:
+    tags.append(i['tag'])
 
 
 display = lcddriver.lcd()
@@ -90,11 +92,11 @@ try:
             print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
             tag = (uid[0], uid[1], uid[2], uid[3])
             for i in database:
-                if i['tag']==tag:
+                if tag in tags and i['tag']==tag:
                     print('Authentication Successful')
                     print(f"Welcome {i['name']}")
-                    continue
-                print('Unauthorized card')
+                else:
+                    print('Unauthorized card')
 
             print(tag)
             display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
