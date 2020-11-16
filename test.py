@@ -34,6 +34,7 @@ def end_read(signal, frame):
     print("Ctrl+C captured, ending read.")
     continue_reading = False
     GPIO.cleanup()
+    source.release()
 
 signal.signal(signal.SIGINT, end_read)
 MIFAREReader = MFRC522.MFRC522()
@@ -98,8 +99,6 @@ try:
             sleep(2)
             display.lcd_clear()
         sleep(1)
-        source.release()
 except KeyboardInterrupt:
     display.lcd_clear()
     GPIO.cleanup()
-    source.release()
