@@ -92,7 +92,7 @@ try:
             print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
             tag = (uid[0], uid[1], uid[2], uid[3])
             if tag not in tags:
-                auth = 'Unauthorized card'
+                auth = 'Auth failed'
                 auth_name = ''
                 print(auth)
             for i in database:
