@@ -103,12 +103,16 @@ try:
                     print(f"Welcome {auth_name}")
                     continue
             print(tag)
-            display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
+            # display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
+            # sleep(2)
+            # display.lcd_clear()
+            display.lcd_display_string(auth, 2)
             sleep(2)
             display.lcd_clear()
-            display.lcd_display_string(auth, 1)
-            display.lcd_display_string("Welcome "+auth_name, 2)
-            sleep(2)
+            if not auth_name=='':
+                display.lcd_display_string("Welcome Back", 1)
+                display.lcd_display_string(auth_name, 2)
+                sleep(2)
             amb_temp = f"Env Temp: {to_fahrenheit(mlx.ambient_temperature)}"
             obj_temp = f"Body Temp: {to_fahrenheit(mlx.object_temperature)}"
             display.lcd_clear()
@@ -120,7 +124,7 @@ try:
             if stat is not None:
                 display.lcd_display_string(str(stat), 2)
             else:
-                display.lcd_display_string("No one is here", 2)
+                display.lcd_display_string("No face visible", 2)
             sleep(2)
             display.lcd_clear()
         sleep(1)
