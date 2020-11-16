@@ -20,8 +20,10 @@ import os
 
 database = [
     {'name': 'Ali', 'tag': (136, 4, 55, 30)},
-    {'name': 'Shikhar', 'tag': (231, 176, 71, 98)},
+    {'name': 'Saif', 'tag': (231, 176, 71, 98)},
+    {'name': 'Marwan', 'tag': (136, 4, 198, 81)},
 ]
+
 
 
 display = lcddriver.lcd()
@@ -91,8 +93,9 @@ try:
                 if i['tag']==tag:
                     print('Authentication Successful')
                     print(f"Welcome {i['name']}")
-                elif not i['tag']==tag:
-                    print("Unauthorized card")
+                    continue
+                print('Unauthorized card')
+
             print(tag)
             display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
             sleep(2)
