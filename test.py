@@ -80,6 +80,7 @@ try:
         (status, uid) = MIFAREReader.MFRC522_Anticoll()
         if status == MIFAREReader.MI_OK:
             print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
+            print(uid)
             display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
             sleep(2)
             amb_temp = f"Env Temp: {to_fahrenheit(mlx.ambient_temperature)}"
