@@ -91,13 +91,13 @@ try:
         if status == MIFAREReader.MI_OK:
             print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
             tag = (uid[0], uid[1], uid[2], uid[3])
+            if tag not in tags:
+                print('Unauthorized card')
             for i in database:
-                if tag in tags and i['tag']==tag:
+                if i['tag']==tag:
                     print('Authentication Successful')
                     print(f"Welcome {i['name']}")
-                else:
-                    print('Unauthorized card')
-
+                    continue
             print(tag)
             display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
             sleep(2)
