@@ -97,6 +97,7 @@ try:
             sleep(2)
             display.lcd_clear()
         sleep(1)
+        source.release()
 except KeyboardInterrupt:
     display.lcd_clear()
     GPIO.cleanup()
