@@ -97,7 +97,7 @@ try:
                 print(auth)
             for i in database:
                 if i['tag']==tag:
-                    auth = 'Authentication Successful'
+                    auth = 'Auth Success'
                     print(auth)
                     auth_name = i['name']
                     print(f"Welcome {auth_name}")
