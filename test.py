@@ -91,7 +91,7 @@ try:
                 if i['tag']==tag:
                     print('Authentication Successful')
                     print(f"Welcome {i['name']}")
-                else:
+                elif not i['tag']==tag:
                     print("Unauthorized card")
             print(tag)
             display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
