@@ -18,6 +18,11 @@ import cv2
 import numpy as np
 import os
 
+database = [
+    {'name': 'Ali', 'tag': (136, 4, 55, 30)},
+    {'name': 'Shikhar', 'tag': (231, 176, 71, 98)},
+]
+
 
 display = lcddriver.lcd()
 
@@ -81,7 +86,14 @@ try:
         (status, uid) = MIFAREReader.MFRC522_Anticoll()
         if status == MIFAREReader.MI_OK:
             print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
-            print(uid)
+            tag = (uid[0], uid[1], uid[2], uid[3])
+            for i in database:
+                if i['tag']==tag:
+                    print('Authentication Successful')
+                    print(f"Welcome {i['name']}")
+                else:
+                    print("Unauthorized card")
+            print(tag)
             display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
             sleep(2)
             amb_temp = f"Env Temp: {to_fahrenheit(mlx.ambient_temperature)}"
