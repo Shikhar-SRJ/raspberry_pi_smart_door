@@ -171,12 +171,13 @@ try:
                 display.lcd_display_string("No face visible", 2)
             sleep(2)
             display.lcd_clear()
+            print(auth)
+            print(stat)
+            print(to_fahrenheit(mlx.object_temperature))
             if auth=='Auth Success' and stat=='MASK' and to_fahrenheit(mlx.object_temperature) < 100:
-                print(auth)
-                print(stat)
-                print(to_fahrenheit(mlx.object_temperature))
-                print()
-                print("Welcome")
+                print("Access Granted")
+                display.lcd_display_string("STATUS :", 1)
+                display.lcd_display_string("ACCESS GRANTED", 2)
                 try:
                     GPIO.output(RELAY_PIN, GPIO.HIGH)
                     sleep(5)
@@ -184,6 +185,13 @@ try:
                     sleep(1)
                 except KeyboardInterrupt:
                     GPIO.cleanup()
+                display.lcd_clear()
+            else:
+                print("Access Denied")
+                display.lcd_display_string("STATUS :", 1)
+                display.lcd_display_string("ACCESS DENIED", 2)
+                sleep(2)
+                display.lcd_clear()
         sleep(1)
 except KeyboardInterrupt:
     display.lcd_clear()
