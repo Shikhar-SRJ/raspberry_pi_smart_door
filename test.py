@@ -166,10 +166,10 @@ try:
                 display.lcd_display_string("No face visible", 2)
             sleep(2)
             display.lcd_clear()
-            # if auth=='Auth Success' and to_fahrenheit(mlx.object_temperature) < 100:
-            #     print(auth)
-            #     print(stat)
-            #     print(to_fahrenheit(mlx.object_temperature))
+            if auth=='Auth Success' and to_fahrenheit(mlx.object_temperature) < 100:
+                print(auth)
+                print(stat)
+                print(to_fahrenheit(mlx.object_temperature))
         sleep(1)
 except KeyboardInterrupt:
     display.lcd_clear()
