@@ -20,8 +20,8 @@ import numpy as np
 import os
 
 path = os.path.abspath(os.path.dirname(__file__))
-protoPath = os.path.join(path, "deploy.prototxt")
-modelPath = os.path.join(path, "res10_300x300_ssd_iter_140000.caffemodel")
+protoPath = os.path.join(path, "face_detector/deploy.prototxt")
+modelPath = os.path.join(path, "face_detector/res10_300x300_ssd_iter_140000.caffemodel")
 detector = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
 
 
