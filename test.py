@@ -43,7 +43,6 @@ mlx = adafruit_mlx90614.MLX90614(i2c)
 
 RELAY_PIN = 40
 GPIO.setup(RELAY_PIN, GPIO.OUT)
-GPIO.output(RELAY_PIN, GPIO.LOW)
 
 def to_fahrenheit(celcius):
     return (9/5)*celcius + 32
@@ -179,6 +178,7 @@ try:
                 GPIO.output(RELAY_PIN, GPIO.HIGH)
                 sleep(5)
                 GPIO.output(RELAY_PIN, GPIO.LOW)
+                sleep(1)
         sleep(1)
 except KeyboardInterrupt:
     display.lcd_clear()
