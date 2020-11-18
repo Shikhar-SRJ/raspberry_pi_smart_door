@@ -175,10 +175,13 @@ try:
                 print(to_fahrenheit(mlx.object_temperature))
                 print()
                 print("Welcome")
-                GPIO.output(RELAY_PIN, GPIO.HIGH)
-                sleep(5)
-                GPIO.output(RELAY_PIN, GPIO.LOW)
-                sleep(1)
+                try:
+                    GPIO.output(RELAY_PIN, GPIO.HIGH)
+                    sleep(5)
+                    GPIO.output(RELAY_PIN, GPIO.LOW)
+                    sleep(1)
+                except KeyboardInterrupt:
+                    GPIO.cleanup()
         sleep(1)
 except KeyboardInterrupt:
     display.lcd_clear()
