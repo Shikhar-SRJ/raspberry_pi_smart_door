@@ -15,14 +15,22 @@ import signal
 # for camera
 import tflite_runtime.interpreter as tflite
 import cv2
+import imutils
 import numpy as np
 import os
+
+path = os.path.abspath(os.path.dirname(__file__))
+protoPath = os.path.join(path, "deploy.prototxt")
+modelPath = os.path.join(path, "res10_300x300_ssd_iter_140000.caffemodel")
+detector = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
+
 
 database = [
     {'name': 'Ali', 'tag': (136, 4, 55, 30)},
     {'name': 'Saif', 'tag': (231, 176, 71, 98)},
     {'name': 'Marwan', 'tag': (136, 4, 198, 181)},
 ]
+
 tags = []
 for i in database:
     tags.append(i['tag'])
@@ -60,28 +68,59 @@ sleep(1)
 
 try:
     while True:
-        ret, frame = source.read()
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        face_cls = cv2.CascadeClassifier('facial_recognition_model.xml')
-        faces = face_cls.detectMultiScale(gray, 1.3, 5)
+        ret, img = source.read()
+        frame = imutils.resize(img, width=600)
+        h, w = frame.shape[:2]
+        imageBlob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0), swapRB=False, crop=False)
 
         input_shape = input_details[0]['shape']
-        img_size = 100
+        img_size = 224
 
         label_dict = {0: 'MASK', 1: "NO MASK"}
         stat = None
-        for x, y, w, h in faces:
-            face_img = gray[y:y + h, x:x + w]
-            resized = cv2.resize(face_img, (img_size, img_size))
-            normalized = resized / 255.0
-            reshaped = np.reshape(normalized, input_shape)
-            reshaped = np.float32(reshaped)
-            interpreter.set_tensor(input_details[0]['index'], reshaped)
-            interpreter.invoke()
-            result = interpreter.get_tensor(output_details[0]['index'])
-            label = np.argmax(result, axis=1)[0]
-            stat = label_dict[label]
+
+        # apply OpenCV's deep learning-based face detector to localize
+        # faces in the input image
+        detector.setInput(imageBlob)
+        detections = detector.forward()
+
+        # loop over the detections
+        for i in range(0, detections.shape[2]):
+            # extract the confidence (i.e., probability) associated with
+            # the prediction
+            confidence = detections[0, 0, i, 2]
+
+            # filter out weak detections
+            if confidence > 0.5:
+                # compute the (x, y)-coordinates of the bounding box for
+                # the face
+                box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                (startX, startY, endX, endY) = box.astype("int")
+
+                # extract the face ROI
+                face = frame[startY:endY, startX:endX]
+                (fH, fW) = face.shape[:2]
+
+                # ensure the face width and height are sufficiently large
+                if fW < 20 or fH < 20:
+                    continue
+
+                # construct a blob for the face ROI, then pass the blob
+                # through our face embedding model to obtain the 128-d
+                # quantification of the face
+                faceBlob = cv2.dnn.blobFromImage(face, 1.0 / 255, (96, 96), (0, 0, 0), swapRB=True, crop=False)
+
+                resized = cv2.resize(frame, (img_size, img_size))
+                normalized = resized / 255.0
+                reshaped = np.reshape(normalized, input_shape)
+                reshaped = np.float32(reshaped)
+                interpreter.set_tensor(input_details[0]['index'], reshaped)
+                interpreter.invoke()
+                result = interpreter.get_tensor(output_details[0]['index'])
+
+                label = np.argmax(result, axis=1)[0]
+                stat = label_dict[label]
+
 
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
         if status == MIFAREReader.MI_OK:
