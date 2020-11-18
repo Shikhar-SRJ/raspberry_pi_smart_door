@@ -41,10 +41,6 @@ display = lcddriver.lcd()
 i2c = io.I2C(board.SCL, board.SDA, frequency=100000)
 mlx = adafruit_mlx90614.MLX90614(i2c)
 
-RELAY_PIN = 40
-GPIO.setup(RELAY_PIN, GPIO.OUT)
-GPIO.output(RELAY_PIN, GPIO.LOW)
-
 def to_fahrenheit(celcius):
     return (9/5)*celcius + 32
 
@@ -170,15 +166,10 @@ try:
                 display.lcd_display_string("No face visible", 2)
             sleep(2)
             display.lcd_clear()
-            if auth=='Auth Success' and stat=='MASK' and to_fahrenheit(mlx.object_temperature) < 100:
+            if auth=='Auth Success' and to_fahrenheit(mlx.object_temperature) < 100:
                 print(auth)
                 print(stat)
                 print(to_fahrenheit(mlx.object_temperature))
-                print()
-                print("Welcome")
-                GPIO.output(RELAY_PIN, GPIO.HIGH)
-                sleep(5)
-                GPIO.output(RELAY_PIN, GPIO.LOW)
         sleep(1)
 except KeyboardInterrupt:
     display.lcd_clear()
