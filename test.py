@@ -133,7 +133,6 @@ try:
                 label = np.argmax(result, axis=1)[0]
                 stat = label_dict[label]
 
-        button_state = GPIO.input(BUTTON_PIN)
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
         if status == MIFAREReader.MI_OK:
             print("card detected")
@@ -200,7 +199,7 @@ try:
                 display.lcd_display_string("ACCESS DENIED", 2)
                 sleep(2)
                 display.lcd_clear()
-        elif not button_state:
+        elif not GPIO.input(BUTTON_PIN):
             c-=1
             try:
                 GPIO.output(RELAY_PIN, GPIO.HIGH)
