@@ -78,8 +78,6 @@ try:
     while True:
         if c<0:
             c=0
-        display.lcd_display_string("Smart Door", 1)
-        display.lcd_display_string(f"{c} people inside", 2)
         ret, img = source.read()
         frame = imutils.resize(img, width=600)
         h, w = frame.shape[:2]
@@ -136,7 +134,6 @@ try:
 
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
         if status == MIFAREReader.MI_OK:
-            display.lcd_clear()
             print("card detected")
             display.lcd_display_string("card detected", 1)
         (status, uid) = MIFAREReader.MFRC522_Anticoll()
