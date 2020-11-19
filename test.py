@@ -42,7 +42,9 @@ i2c = io.I2C(board.SCL, board.SDA, frequency=100000)
 mlx = adafruit_mlx90614.MLX90614(i2c)
 
 RELAY_PIN = 21
+BUTTON_PIN = 23
 GPIO.setmode(GPIO.BCM)
+GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(RELAY_PIN, GPIO.OUT)
 GPIO.output(RELAY_PIN, GPIO.LOW)
 
@@ -71,8 +73,11 @@ label_dict = {0:'MASK', 1:"NO MASK"}
 source = cv2.VideoCapture(0)
 sleep(1)
 
+c = 0
 try:
     while True:
+        display.lcd_display_string("Smart Door", 1)
+        display.lcd_display_string(f"{c} people inside", 2)
         ret, img = source.read()
         frame = imutils.resize(img, width=600)
         h, w = frame.shape[:2]
@@ -129,6 +134,7 @@ try:
 
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
         if status == MIFAREReader.MI_OK:
+            display.lcd_clear()
             print("card detected")
             display.lcd_display_string("card detected", 1)
         (status, uid) = MIFAREReader.MFRC522_Anticoll()
@@ -175,6 +181,7 @@ try:
             print(stat)
             print(to_fahrenheit(mlx.object_temperature))
             if auth=='Auth Success' and stat=='MASK' and to_fahrenheit(mlx.object_temperature) < 100:
+                c+=1
                 print("Access Granted")
                 display.lcd_display_string("STATUS :", 1)
                 display.lcd_display_string("ACCESS GRANTED", 2)
@@ -193,6 +200,18 @@ try:
                 sleep(2)
                 display.lcd_clear()
         sleep(1)
+        button_state = GPIO.input(BUTTON_PIN)
+        if not button_state:
+            c-=1
+            try:
+                GPIO.output(RELAY_PIN, GPIO.HIGH)
+                sleep(5)
+                GPIO.output(RELAY_PIN, GPIO.LOW)
+                sleep(1)
+            except KeyboardInterrupt:
+                GPIO.cleanup()
+            while not GPIO.input(BUTTON_PIN):
+                sleep(0.2)
 except KeyboardInterrupt:
     display.lcd_clear()
     GPIO.cleanup()
