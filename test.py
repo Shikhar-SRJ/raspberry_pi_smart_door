@@ -76,8 +76,6 @@ sleep(1)
 c = 0
 try:
     while True:
-        if c<0:
-            c=0
         ret, img = source.read()
         frame = imutils.resize(img, width=600)
         h, w = frame.shape[:2]
