@@ -42,8 +42,10 @@ i2c = io.I2C(board.SCL, board.SDA, frequency=100000)
 mlx = adafruit_mlx90614.MLX90614(i2c)
 
 RELAY_PIN = 21
+BUTTON_PIN = 23
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(RELAY_PIN, GPIO.OUT)
+GPIO.setup(BUTTON_PIN, GPIO.IN)
 GPIO.output(RELAY_PIN, GPIO.LOW)
 
 def to_fahrenheit(celcius):
@@ -71,8 +73,13 @@ label_dict = {0:'MASK', 1:"NO MASK"}
 source = cv2.VideoCapture(0)
 sleep(1)
 
+c = 0
 try:
     while True:
+        display.lcd_display_string("Smart Door", 1)
+        display.lcd_display_string(f'{c} people inside', 2)
+        sleep(2)
+        display.lcd_clear()
         ret, img = source.read()
         frame = imutils.resize(img, width=600)
         h, w = frame.shape[:2]
@@ -126,7 +133,7 @@ try:
                 label = np.argmax(result, axis=1)[0]
                 stat = label_dict[label]
 
-
+        button_state = GPIO.input(BUTTON_PIN)
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
         if status == MIFAREReader.MI_OK:
             print("card detected")
@@ -175,6 +182,7 @@ try:
             print(stat)
             print(to_fahrenheit(mlx.object_temperature))
             if auth=='Auth Success' and stat=='MASK' and to_fahrenheit(mlx.object_temperature) < 100:
+                c+=1
                 print("Access Granted")
                 display.lcd_display_string("STATUS :", 1)
                 display.lcd_display_string("ACCESS GRANTED", 2)
@@ -192,7 +200,20 @@ try:
                 display.lcd_display_string("ACCESS DENIED", 2)
                 sleep(2)
                 display.lcd_clear()
+        elif not button_state:
+            c-=1
+            try:
+                GPIO.output(RELAY_PIN, GPIO.HIGH)
+                sleep(5)
+                GPIO.output(RELAY_PIN, GPIO.LOW)
+                sleep(1)
+            except KeyboardInterrupt:
+                GPIO.cleanup()
+            while not GPIO.input(BUTTON_PIN):
+                sleep(0.2)
         sleep(1)
+        if c<0: c=0
+
 except KeyboardInterrupt:
     display.lcd_clear()
     GPIO.cleanup()
