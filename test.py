@@ -76,6 +76,8 @@ sleep(1)
 c = 0
 try:
     while True:
+        if c<0:
+            c=0
         display.lcd_display_string("Smart Door", 1)
         display.lcd_display_string(f"{c} people inside", 2)
         ret, img = source.read()
@@ -203,6 +205,7 @@ try:
         button_state = GPIO.input(BUTTON_PIN)
         if not button_state:
             c-=1
+            print("button pressed")
             try:
                 GPIO.output(RELAY_PIN, GPIO.HIGH)
                 sleep(5)
@@ -212,6 +215,7 @@ try:
                 GPIO.cleanup()
             while not GPIO.input(BUTTON_PIN):
                 sleep(0.2)
+        sleep(1)
 except KeyboardInterrupt:
     display.lcd_clear()
     GPIO.cleanup()
