@@ -73,69 +73,63 @@ label_dict = {0:'MASK', 1:"NO MASK"}
 source = cv2.VideoCapture(0)
 sleep(1)
 
-
-def status(source):
-    ret, img = source.read()
-    frame = imutils.resize(img, width=600)
-    h, w = frame.shape[:2]
-    imageBlob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0),
-                                      swapRB=False, crop=False)
-
-    input_shape = input_details[0]['shape']
-    img_size = 224
-
-    label_dict = {0: 'MASK', 1: "NO MASK"}
-    stat = None
-
-    # apply OpenCV's deep learning-based face detector to localize
-    # faces in the input image
-    detector.setInput(imageBlob)
-    detections = detector.forward()
-
-    # loop over the detections
-    for i in range(0, detections.shape[2]):
-        # extract the confidence (i.e., probability) associated with
-        # the prediction
-        confidence = detections[0, 0, i, 2]
-
-        # filter out weak detections
-        if confidence > 0.5:
-            # compute the (x, y)-coordinates of the bounding box for
-            # the face
-            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
-            (startX, startY, endX, endY) = box.astype("int")
-
-            # extract the face ROI
-            face = frame[startY:endY, startX:endX]
-            (fH, fW) = face.shape[:2]
-
-            # ensure the face width and height are sufficiently large
-            if fW < 20 or fH < 20:
-                continue
-
-            # construct a blob for the face ROI, then pass the blob
-            # through our face embedding model to obtain the 128-d
-            # quantification of the face
-            faceBlob = cv2.dnn.blobFromImage(face, 1.0 / 255, (96, 96), (0, 0, 0), swapRB=True, crop=False)
-
-            resized = cv2.resize(frame, (img_size, img_size))
-            normalized = resized / 255.0
-            reshaped = np.reshape(normalized, input_shape)
-            reshaped = np.float32(reshaped)
-            interpreter.set_tensor(input_details[0]['index'], reshaped)
-            interpreter.invoke()
-            result = interpreter.get_tensor(output_details[0]['index'])
-
-            label = np.argmax(result, axis=1)[0]
-            stat = label_dict[label]
-    return stat
-
-
 max_count = 2
 c = 0
-
 try:
     while True:
+        ret, img = source.read()
+        frame = imutils.resize(img, width=600)
+        h, w = frame.shape[:2]
+        imageBlob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0), swapRB=False, crop=False)
+
+        input_shape = input_details[0]['shape']
+        img_size = 224
+
+        label_dict = {0: 'MASK', 1: "NO MASK"}
+        stat = None
+
+        # apply OpenCV's deep learning-based face detector to localize
+        # faces in the input image
+        detector.setInput(imageBlob)
+        detections = detector.forward()
+
+        # loop over the detections
+        for i in range(0, detections.shape[2]):
+            # extract the confidence (i.e., probability) associated with
+            # the prediction
+            confidence = detections[0, 0, i, 2]
+
+            # filter out weak detections
+            if confidence > 0.5:
+                # compute the (x, y)-coordinates of the bounding box for
+                # the face
+                box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                (startX, startY, endX, endY) = box.astype("int")
+
+                # extract the face ROI
+                face = frame[startY:endY, startX:endX]
+                (fH, fW) = face.shape[:2]
+
+                # ensure the face width and height are sufficiently large
+                if fW < 20 or fH < 20:
+                    continue
+
+                # construct a blob for the face ROI, then pass the blob
+                # through our face embedding model to obtain the 128-d
+                # quantification of the face
+                faceBlob = cv2.dnn.blobFromImage(face, 1.0 / 255, (96, 96), (0, 0, 0), swapRB=True, crop=False)
+
+                resized = cv2.resize(frame, (img_size, img_size))
+                normalized = resized / 255.0
+                reshaped = np.reshape(normalized, input_shape)
+                reshaped = np.float32(reshaped)
+                interpreter.set_tensor(input_details[0]['index'], reshaped)
+                interpreter.invoke()
+                result = interpreter.get_tensor(output_details[0]['index'])
+
+                label = np.argmax(result, axis=1)[0]
+                stat = label_dict[label]
+
         display.lcd_display_string("Smart Door", 1)
         display.lcd_display_string(f'{c} people inside', 2)
         sleep(2)
@@ -155,13 +149,11 @@ try:
                 GPIO.cleanup()
             while GPIO.input(BUTTON_PIN):
                 sleep(0.2)
-
         if status == MIFAREReader.MI_OK:
             print("card detected")
             display.lcd_display_string("card detected", 1)
         (status, uid) = MIFAREReader.MFRC522_Anticoll()
 
-        stat = status(source)
         if status == MIFAREReader.MI_OK:
             if c == max_count:
                 print(f"Room full...!")
