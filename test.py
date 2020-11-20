@@ -199,7 +199,7 @@ try:
                 display.lcd_display_string("ACCESS DENIED", 2)
                 sleep(2)
                 display.lcd_clear()
-        elif not GPIO.input(BUTTON_PIN):
+        elif GPIO.input(BUTTON_PIN)==False:
             c-=1
             try:
                 GPIO.output(RELAY_PIN, GPIO.HIGH)
@@ -208,7 +208,7 @@ try:
                 sleep(1)
             except KeyboardInterrupt:
                 GPIO.cleanup()
-            while not GPIO.input(BUTTON_PIN):
+            while GPIO.input(BUTTON_PIN)==False:
                 sleep(0.2)
         sleep(1)
         if c<0: c=0
