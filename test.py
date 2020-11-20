@@ -201,6 +201,7 @@ try:
                 display.lcd_clear()
         elif GPIO.input(BUTTON_PIN)==False:
             c-=1
+            print("Button pressed")
             try:
                 GPIO.output(RELAY_PIN, GPIO.HIGH)
                 sleep(5)
