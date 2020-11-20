@@ -76,10 +76,6 @@ sleep(1)
 c = 0
 try:
     while True:
-        display.lcd_display_string("Smart Door", 1)
-        display.lcd_display_string(f'{c} people inside', 2)
-        sleep(2)
-        display.lcd_clear()
         ret, img = source.read()
         frame = imutils.resize(img, width=600)
         h, w = frame.shape[:2]
@@ -133,11 +129,17 @@ try:
                 label = np.argmax(result, axis=1)[0]
                 stat = label_dict[label]
 
+        display.lcd_display_string("Smart Door", 1)
+        display.lcd_display_string(f'{c} people inside', 2)
+        sleep(2)
+        display.lcd_clear()
+
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
         if status == MIFAREReader.MI_OK:
             print("card detected")
             display.lcd_display_string("card detected", 1)
         (status, uid) = MIFAREReader.MFRC522_Anticoll()
+
         if status == MIFAREReader.MI_OK:
             print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
             tag = (uid[0], uid[1], uid[2], uid[3])
@@ -199,7 +201,8 @@ try:
                 display.lcd_display_string("ACCESS DENIED", 2)
                 sleep(2)
                 display.lcd_clear()
-        elif GPIO.input(BUTTON_PIN)==False:
+
+        elif GPIO.input(BUTTON_PIN):
             c-=1
             print("Button pressed")
             try:
@@ -209,7 +212,7 @@ try:
                 sleep(1)
             except KeyboardInterrupt:
                 GPIO.cleanup()
-            while GPIO.input(BUTTON_PIN)==False:
+            while GPIO.input(BUTTON_PIN):
                 sleep(0.2)
         sleep(1)
         if c<0: c=0
