@@ -77,10 +77,40 @@ max_count = 2
 c = 0
 try:
     while True:
+        display.lcd_display_string("Smart Door", 1)
+        display.lcd_display_string(f'{c} people inside', 2)
+        sleep(2)
+        display.lcd_clear()
+        button_state = GPIO.input(BUTTON_PIN)
+        (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
+
+        if button_state:
+            c-=1
+            print("Button pressed")
+            try:
+                GPIO.output(RELAY_PIN, GPIO.HIGH)
+                sleep(5)
+                GPIO.output(RELAY_PIN, GPIO.LOW)
+                sleep(1)
+            except KeyboardInterrupt:
+                GPIO.cleanup()
+            while GPIO.input(BUTTON_PIN):
+                sleep(0.2)
+        if status == MIFAREReader.MI_OK:
+            print("card detected")
+            display.lcd_display_string("card detected", 1)
+            if c == max_count:
+                print(f"Room full...!")
+                display.lcd_display_string("Room full", 2)
+                sleep(2)
+                display.lcd_clear()
+                continue
+
         ret, img = source.read()
         frame = imutils.resize(img, width=600)
         h, w = frame.shape[:2]
-        imageBlob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0), swapRB=False, crop=False)
+        imageBlob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0),
+                                          swapRB=False, crop=False)
 
         input_shape = input_details[0]['shape']
         img_size = 224
@@ -130,37 +160,8 @@ try:
                 label = np.argmax(result, axis=1)[0]
                 stat = label_dict[label]
 
-        display.lcd_display_string("Smart Door", 1)
-        display.lcd_display_string(f'{c} people inside', 2)
-        sleep(2)
-        display.lcd_clear()
-        button_state = GPIO.input(BUTTON_PIN)
-        (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
-
-        if button_state:
-            c-=1
-            print("Button pressed")
-            try:
-                GPIO.output(RELAY_PIN, GPIO.HIGH)
-                sleep(5)
-                GPIO.output(RELAY_PIN, GPIO.LOW)
-                sleep(1)
-            except KeyboardInterrupt:
-                GPIO.cleanup()
-            while GPIO.input(BUTTON_PIN):
-                sleep(0.2)
-        if status == MIFAREReader.MI_OK:
-            print("card detected")
-            display.lcd_display_string("card detected", 1)
         (status, uid) = MIFAREReader.MFRC522_Anticoll()
-
         if status == MIFAREReader.MI_OK:
-            if c == max_count:
-                print(f"Room full...!")
-                display.lcd_display_string("Room full", 2)
-                sleep(2)
-                display.lcd_clear()
-                continue
             print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
             tag = (uid[0], uid[1], uid[2], uid[3])
             if tag not in tags:
