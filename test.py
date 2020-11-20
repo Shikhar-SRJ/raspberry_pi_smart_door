@@ -133,7 +133,7 @@ try:
         display.lcd_display_string(f'{c} people inside', 2)
         sleep(2)
         display.lcd_clear()
-
+        button_state = GPIO.input(BUTTON_PIN)
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
         if status == MIFAREReader.MI_OK:
             print("card detected")
@@ -201,8 +201,7 @@ try:
                 display.lcd_display_string("ACCESS DENIED", 2)
                 sleep(2)
                 display.lcd_clear()
-
-        elif GPIO.input(BUTTON_PIN):
+        elif button_state:
             c-=1
             print("Button pressed")
             try:
