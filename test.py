@@ -73,6 +73,7 @@ label_dict = {0:'MASK', 1:"NO MASK"}
 source = cv2.VideoCapture(0)
 sleep(1)
 
+max_count = 2
 c = 0
 try:
     while True:
@@ -135,12 +136,31 @@ try:
         display.lcd_clear()
         button_state = GPIO.input(BUTTON_PIN)
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
+
+        if button_state:
+            c-=1
+            print("Button pressed")
+            try:
+                GPIO.output(RELAY_PIN, GPIO.HIGH)
+                sleep(5)
+                GPIO.output(RELAY_PIN, GPIO.LOW)
+                sleep(1)
+            except KeyboardInterrupt:
+                GPIO.cleanup()
+            while GPIO.input(BUTTON_PIN):
+                sleep(0.2)
         if status == MIFAREReader.MI_OK:
             print("card detected")
             display.lcd_display_string("card detected", 1)
         (status, uid) = MIFAREReader.MFRC522_Anticoll()
 
         if status == MIFAREReader.MI_OK:
+            if c == max_count:
+                print(f"Room full...!")
+                display.lcd_display_string("Room full", 2)
+                sleep(2)
+                display.lcd_clear()
+                continue
             print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
             tag = (uid[0], uid[1], uid[2], uid[3])
             if tag not in tags:
@@ -201,18 +221,6 @@ try:
                 display.lcd_display_string("ACCESS DENIED", 2)
                 sleep(2)
                 display.lcd_clear()
-        elif button_state:
-            c-=1
-            print("Button pressed")
-            try:
-                GPIO.output(RELAY_PIN, GPIO.HIGH)
-                sleep(5)
-                GPIO.output(RELAY_PIN, GPIO.LOW)
-                sleep(1)
-            except KeyboardInterrupt:
-                GPIO.cleanup()
-            while GPIO.input(BUTTON_PIN):
-                sleep(0.2)
         sleep(1)
         if c<0: c=0
 
