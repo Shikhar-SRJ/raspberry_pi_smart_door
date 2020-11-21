@@ -79,7 +79,7 @@ try:
     while True:
         display.lcd_display_string("Smart Door", 1)
         display.lcd_display_string(f'{c} people inside', 2)
-        sleep(2)
+        sleep(1)
         display.lcd_clear()
         button_state = GPIO.input(BUTTON_PIN)
         (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
@@ -89,7 +89,7 @@ try:
             print("Button pressed")
             try:
                 GPIO.output(RELAY_PIN, GPIO.HIGH)
-                sleep(5)
+                sleep(3)
                 GPIO.output(RELAY_PIN, GPIO.LOW)
                 sleep(1)
             except KeyboardInterrupt:
@@ -102,7 +102,7 @@ try:
             if c == max_count:
                 print(f"Room full...!")
                 display.lcd_display_string("Room full", 2)
-                sleep(2)
+                sleep(1)
                 display.lcd_clear()
                 continue
 
@@ -180,25 +180,25 @@ try:
             # sleep(2)
             # display.lcd_clear()
             display.lcd_display_string(auth, 2)
-            sleep(2)
+            sleep(1)
             display.lcd_clear()
             if not auth_name=='':
                 display.lcd_display_string("Welcome Back", 1)
                 display.lcd_display_string(auth_name, 2)
-                sleep(2)
+                sleep(1)
             amb_temp = f"Env Temp: {to_fahrenheit(mlx.ambient_temperature)}"
             obj_temp = f"Body Temp: {to_fahrenheit(mlx.object_temperature)}"
             display.lcd_clear()
             display.lcd_display_string(amb_temp, 1)
             display.lcd_display_string(obj_temp, 2)
-            sleep(2)
+            sleep(1)
             display.lcd_clear()
             display.lcd_display_string('MASK STATUS', 1)
             if stat is not None:
                 display.lcd_display_string(str(stat), 2)
             else:
                 display.lcd_display_string("No face visible", 2)
-            sleep(2)
+            sleep(1)
             display.lcd_clear()
             print(auth)
             print(stat)
@@ -220,7 +220,7 @@ try:
                 print("Access Denied")
                 display.lcd_display_string("STATUS :", 1)
                 display.lcd_display_string("ACCESS DENIED", 2)
-                sleep(2)
+                sleep(1)
                 display.lcd_clear()
         sleep(1)
         if c<0: c=0
