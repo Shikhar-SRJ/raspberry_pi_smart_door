@@ -145,6 +145,7 @@ try:
 
             if auth_name in people_inside and auth_name!='':
                 people_inside.remove(auth_name)
+                continue
 
         ret, img = source.read()
         frame = imutils.resize(img, width=600)
@@ -200,7 +201,6 @@ try:
                 label = np.argmax(result, axis=1)[0]
                 stat = label_dict[label]
 
-        (status, uid) = MIFAREReader.MFRC522_Anticoll()
         if status == MIFAREReader.MI_OK:
             # display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
             # sleep(2)
@@ -288,7 +288,7 @@ try:
                 sleep(1)
                 display.lcd_clear()
         sleep(1)
-        print(people_inside)
+        print("List of people inside:", people_inside)
         if c<0: c=0
 
 except KeyboardInterrupt:
