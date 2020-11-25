@@ -1,9 +1,8 @@
 import RPi.GPIO as GPIO
 from time import sleep
 
-GPIO.setmode(GPIO.BCM) # GPIO Numbers instead of board numbers
-
-RELAY_PIN = 21
+GPIO.setmode(GPIO.BOARD) # GPIO Numbers instead of board numbers
+RELAY_PIN = 40
 GPIO.setup(RELAY_PIN, GPIO.OUT) # GPIO Assign mode
 while True:
     i = int(input())

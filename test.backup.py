@@ -18,13 +18,6 @@ import cv2
 import imutils
 import numpy as np
 import os
-import serial
-import time
-import RPi.GPIO as GPIO
-import base64
-import codecs
-import adafruit_tcs34725
-
 
 path = os.path.abspath(os.path.dirname(__file__))
 protoPath = os.path.join(path, "face_detector/deploy.prototxt")
@@ -33,9 +26,9 @@ detector = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
 
 
 database = [
-    {'name': 'Saif', 'tag': (136, 4, 55, 30), "phone_number":"971551234567", "eid":"784123412341234"},
-    {'name': 'Ali', 'tag': (231, 176, 71, 98),"phone_number":"971507422994", "eid":"784199746027202" },
-    {'name': 'Marwan', 'tag': (136, 4, 198, 181), "phone_number":"971551234567", "eid":"784123412341234"}
+    {'name': 'Ali', 'tag': (136, 4, 55, 30)},
+    {'name': 'Saif', 'tag': (231, 176, 71, 98)},
+    {'name': 'Marwan', 'tag': (136, 4, 198, 181)},
 ]
 
 tags = []
@@ -66,15 +59,6 @@ def end_read(signal, frame):
     continue_reading = False
     GPIO.cleanup()
     source.release()
-
-
-sensor = adafruit_tcs34725.TCS34725(i2c)
-
-
-ser = serial.Serial('/dev/serial0', 9600, timeout=10)
-GPIO.setup(4, GPIO.IN)
-GPIO.setup(17, GPIO.OUT)
-
 
 signal.signal(signal.SIGINT, end_read)
 MIFAREReader = MFRC522.MFRC522()
@@ -190,9 +174,6 @@ try:
                     print(auth)
                     auth_name = i['name']
                     print(f"Welcome {auth_name}")
-                    auth_phone_number = i['phone_number']
-                    auth_eid = i['eid']
-                    
                     continue
             print(tag)
             # display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
@@ -223,56 +204,18 @@ try:
             print(stat)
             print(to_fahrenheit(mlx.object_temperature))
             if auth=='Auth Success' and stat=='MASK' and to_fahrenheit(mlx.object_temperature) < 100:
-                display.lcd_clear()
-                display.lcd_display_string("Please scan your", 1)
-                display.lcd_display_string("QR code", 2)
-                user_match = False
-                s = input()
-                s = s[0:-2]
-                #s.decode("utf-8")
-                if len(s)>2:
-                    (r , g, b ) = sensor.color_rgb_bytes
-                    print("R: " + str(r)+ ",G: " +str(g) + ",B: "+ str(b))
-                    #if (g == b == 45):
-                    if r >= 45:
-                        print("Positive Test result")
-                        testResult = False
-                    else :
-                        testResult = True
-                        print("Negative Test Result")
-                        s = base64.b64decode(s+"==")
-                        s = s.decode("utf-8", "replace")
-                        print(s)
-                        eid = s[s.find("784"): s.find("784")+15]
-                        phone_number = s[s.find("9715"): s.find("9715")+12]
-                        print(eid)
-                        print(phone_number)
-                        if (eid == auth_eid  and phone_number == auth_phone_number ):
-                            user_match = True
-                else :
-                    print("error in reading QRCode")
-                    testResult = False
-                print(s)
-                time.sleep(0.2)
-                if (testResult and user_match):
-                    c+=1
-                    print("Access Granted")
-                    display.lcd_display_string("STATUS :", 1)
-                    display.lcd_display_string("ACCESS GRANTED", 2)
-                    try:
-                        GPIO.output(RELAY_PIN, GPIO.HIGH)
-                        sleep(5)
-                        GPIO.output(RELAY_PIN, GPIO.LOW)
-                        sleep(1)
-                    except KeyboardInterrupt:
-                        GPIO.cleanup()
-                    display.lcd_clear()
-                else:
-                    print("Access Denied")
-                    display.lcd_display_string("STATUS :", 1)
-                    display.lcd_display_string("ACCESS DENIED", 2)
+                c+=1
+                print("Access Granted")
+                display.lcd_display_string("STATUS :", 1)
+                display.lcd_display_string("ACCESS GRANTED", 2)
+                try:
+                    GPIO.output(RELAY_PIN, GPIO.HIGH)
+                    sleep(5)
+                    GPIO.output(RELAY_PIN, GPIO.LOW)
                     sleep(1)
-                    display.lcd_clear()
+                except KeyboardInterrupt:
+                    GPIO.cleanup()
+                display.lcd_clear()
             else:
                 print("Access Denied")
                 display.lcd_display_string("STATUS :", 1)
