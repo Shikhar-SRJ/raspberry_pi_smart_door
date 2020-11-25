@@ -288,6 +288,7 @@ try:
                 sleep(1)
                 display.lcd_clear()
         sleep(1)
+        print(people_inside)
         if c<0: c=0
 
 except KeyboardInterrupt:
