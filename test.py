@@ -143,9 +143,9 @@ try:
                     continue
             print(tag)
 
-            # if auth_name in people_inside and auth_name!='':
-            #     people_inside.remove(auth_name)
-            #     continue
+            if auth_name in people_inside and auth_name!='':
+                people_inside.remove(auth_name)
+                continue
 
         ret, img = source.read()
         frame = imutils.resize(img, width=600)
