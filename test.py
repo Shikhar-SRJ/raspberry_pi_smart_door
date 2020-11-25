@@ -124,29 +124,6 @@ try:
                 display.lcd_clear()
                 continue
 
-        (status, uid) = MIFAREReader.MFRC522_Anticoll()
-        if status == MIFAREReader.MI_OK:
-            print(f"Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
-            tag = (uid[0], uid[1], uid[2], uid[3])
-            if tag not in tags:
-                auth = 'Auth failed'
-                auth_name = ''
-                print(auth)
-            for i in database:
-                if i['tag'] == tag:
-                    auth = 'Auth Success'
-                    print(auth)
-                    auth_name = i['name']
-                    print(f"Welcome {auth_name}")
-                    auth_phone_number = i['phone_number']
-                    auth_eid = i['eid']
-                    continue
-            print(tag)
-
-            if auth_name in people_inside and auth_name!='':
-                people_inside.remove(auth_name)
-                continue
-
         ret, img = source.read()
         frame = imutils.resize(img, width=600)
         h, w = frame.shape[:2]
@@ -201,7 +178,29 @@ try:
                 label = np.argmax(result, axis=1)[0]
                 stat = label_dict[label]
 
+        (status, uid) = MIFAREReader.MFRC522_Anticoll()
         if status == MIFAREReader.MI_OK:
+            print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
+            tag = (uid[0], uid[1], uid[2], uid[3])
+            if tag not in tags:
+                auth = 'Auth failed'
+                auth_name = ''
+                print(auth)
+            for i in database:
+                if i['tag']==tag:
+                    auth = 'Auth Success'
+                    print(auth)
+                    auth_name = i['name']
+                    print(f"Welcome {auth_name}")
+                    auth_phone_number = i['phone_number']
+                    auth_eid = i['eid']
+                    continue
+            if auth_name in people_inside:
+                people_inside.remove(auth_name)
+                display.lcd_display_string("Exit recorded", 2)
+                sleep(1)
+                continue
+            print(tag)
             # display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
             # sleep(2)
             # display.lcd_clear()
@@ -254,7 +253,7 @@ try:
                         phone_number = s[s.find("9715"): s.find("9715")+12]
                         print(eid)
                         print(phone_number)
-                        if (eid == auth_eid  and phone_number == auth_phone_number ):
+                        if eid == auth_eid  and phone_number == auth_phone_number:
                             user_match = True
                 else :
                     print("error in reading QRCode")
@@ -288,7 +287,7 @@ try:
                 sleep(1)
                 display.lcd_clear()
         sleep(1)
-        print("List of people inside:", people_inside)
+        print(f"List of people inside: {auth_name}")
         if c<0: c=0
 
 except KeyboardInterrupt:
