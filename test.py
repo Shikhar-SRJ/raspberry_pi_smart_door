@@ -91,6 +91,8 @@ sleep(1)
 
 max_count = 2
 c = 0
+people_inside = []
+
 try:
     while True:
         display.lcd_display_string("Smart Door", 1)
@@ -121,6 +123,27 @@ try:
                 sleep(1)
                 display.lcd_clear()
                 continue
+
+
+            print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
+            tag = (uid[0], uid[1], uid[2], uid[3])
+            if tag not in tags:
+                auth = 'Auth failed'
+                auth_name = ''
+                print(auth)
+            for i in database:
+                if i['tag'] == tag:
+                    auth = 'Auth Success'
+                    print(auth)
+                    auth_name = i['name']
+                    print(f"Welcome {auth_name}")
+                    auth_phone_number = i['phone_number']
+                    auth_eid = i['eid']
+                    continue
+            print(tag)
+
+            if auth_name in people_inside and auth_name!='':
+                people_inside.remove(auth_name)
 
         ret, img = source.read()
         frame = imutils.resize(img, width=600)
@@ -178,23 +201,6 @@ try:
 
         (status, uid) = MIFAREReader.MFRC522_Anticoll()
         if status == MIFAREReader.MI_OK:
-            print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
-            tag = (uid[0], uid[1], uid[2], uid[3])
-            if tag not in tags:
-                auth = 'Auth failed'
-                auth_name = ''
-                print(auth)
-            for i in database:
-                if i['tag']==tag:
-                    auth = 'Auth Success'
-                    print(auth)
-                    auth_name = i['name']
-                    print(f"Welcome {auth_name}")
-                    auth_phone_number = i['phone_number']
-                    auth_eid = i['eid']
-                    
-                    continue
-            print(tag)
             # display.lcd_display_string(f"{(uid[0], uid[1], uid[2], uid[3])}", 2)
             # sleep(2)
             # display.lcd_clear()
@@ -259,6 +265,7 @@ try:
                     print("Access Granted")
                     display.lcd_display_string("STATUS :", 1)
                     display.lcd_display_string("ACCESS GRANTED", 2)
+                    people_inside.append(auth_name)
                     try:
                         GPIO.output(RELAY_PIN, GPIO.HIGH)
                         sleep(5)
