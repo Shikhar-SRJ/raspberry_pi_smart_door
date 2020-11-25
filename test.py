@@ -124,8 +124,9 @@ try:
                 display.lcd_clear()
                 continue
 
-
-            print("Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
+        (status, uid) = MIFAREReader.MFRC522_Anticoll()
+        if status == MIFAREReader.MI_OK:
+            print(f"Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
             tag = (uid[0], uid[1], uid[2], uid[3])
             if tag not in tags:
                 auth = 'Auth failed'
