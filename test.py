@@ -260,7 +260,7 @@ try:
                     testResult = False
                 print(s)
                 time.sleep(0.2)
-                if (testResult and user_match):
+                if testResult and user_match:
                     c+=1
                     print("Access Granted")
                     display.lcd_display_string("STATUS :", 1)
@@ -287,7 +287,7 @@ try:
                 sleep(1)
                 display.lcd_clear()
         sleep(1)
-        print(f"List of people inside: {auth_name}")
+        print(f"List of people inside: {people_inside}")
         if c<0: c=0
 
 except KeyboardInterrupt:
