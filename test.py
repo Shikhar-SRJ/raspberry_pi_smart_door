@@ -2,7 +2,10 @@
 import board
 import busio as io
 import adafruit_mlx90614
-from time import sleep
+
+# for attendence
+from time import sleep, strftime, localtime
+import pandas as pd
 
 # for lcd
 from test_lcd import lcddriver
@@ -42,6 +45,8 @@ tags = []
 for i in database:
     tags.append(i['tag'])
 
+df = pd.DataFrame(columns=["Date", "Name", "Entry_Time", "Exit_Time"])
+t = time.localtime
 
 display = lcddriver.lcd()
 
@@ -91,10 +96,14 @@ sleep(1)
 
 max_count = 2
 c = 0
+d = 1
 people_inside = []
 
 try:
     while True:
+        current_time = time.strftime("%H:%M:%S", t())
+        current_date = time.strftime("%D", t())
+
         display.lcd_display_string("Smart Door", 1)
         display.lcd_display_string(f'{c} people inside', 2)
         sleep(1)
@@ -198,6 +207,7 @@ try:
             if auth_name in people_inside:
                 people_inside.remove(auth_name)
                 display.lcd_display_string("Exit recorded", 2)
+                df['Exit_Time'][df['Name'] == auth_name] = current_time
                 sleep(1)
                 continue
             print(tag)
@@ -266,6 +276,8 @@ try:
                     display.lcd_display_string("STATUS :", 1)
                     display.lcd_display_string("ACCESS GRANTED", 2)
                     people_inside.append(auth_name)
+                    df.loc[d] = current_date, auth_name, current_time, '--'
+                    d+=1
                     try:
                         GPIO.output(RELAY_PIN, GPIO.HIGH)
                         sleep(5)
@@ -288,6 +300,8 @@ try:
                 display.lcd_clear()
         sleep(1)
         print(f"List of people inside: {people_inside}")
+        a = time.strftime("%d_%m_%y", t())
+        df.to_csv("attendence/"+"attendence_" + a + ".csv")
         if c<0: c=0
 
 except KeyboardInterrupt:
